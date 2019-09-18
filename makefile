@@ -1,31 +1,26 @@
-# target executable name
-TARGET = PA01
+appname := PA01
 
-# Compiler
-CC=g++
+CXX := g++
+CXXFLAGS := -std=c++11
 
-# Compiler Flags
-CXXFLAGS = -g -Wall -std=c++11
+srcfiles := $(shell find . -name "*.cpp")
+objects	:= $(patsubst %.cpp, %.o, $(srcfiles))
 
-# Source files
-SOURCES = image.cpp ReadImage.cpp driver.cpp
+all: $(appname)
 
-# header file dependencies
-HEADERS = image.h
+$(appname): $(objects)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(appname) $(objects) $(LDLIBS)
 
-# Object files
-OBJECTS = $(SOURCES:.cpp=.o)
+depend: .depend
 
-#default target
-all: $(TARGET)
+.depend: $(srcfiles)
+	rm -f ./.depend
+	$(CXX) $(CXXFLAGS) -MM $^>>./.depend;
 
-# link everything together
-$(TARGET):	$(OBJECTS)
-				$(CC) $(CXXFLAGS) -o $(TARGET) $(OBJECTS)
-
-$(OBJECTS):	$(SOURCES) $(HEADERS)
-				$(CC) $(CXXFLAGS) -c $(SOURCES)
-
-# Clean target
 clean:
-		rm $(TARGET) $(OBJECTS)
+	rm -f $(objects)
+
+dist-clean: clean
+	rm -f *~ .depend
+
+include .depend

@@ -1,14 +1,16 @@
-#include "ReadImage.cpp"
+#include "../include/image.h"
 
-int main() {
+int readImage(char[], ImageType&);
 
+int main(int argc, char *argv[]) {
     int M, N, Q;
+
+    char* filePath = "../data_input/peppers.pgm";
 
     ImageType image(N, M, Q);
 
-    if (readImage("../data_input/peppers.pgm", image)) {
-        cout << "Success.\n";
-    }
+    readImage(filePath, image);
+
 
     return 0;
 }
