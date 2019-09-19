@@ -4,7 +4,7 @@
 
 #include "../include/image.h"
 
-int readImage(char fname[], ImageType& image)
+int readImage(const char fname[], ImageType& image)
 {
  int i, j;
  int N, M, Q;
