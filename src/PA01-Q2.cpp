@@ -1,7 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
-#include <string.h>
+#include <string>
+#include <cstring>
+#include <sstream>
 #include "../include/image.h"
 
 int writeImage(const char[], ImageType&);
@@ -22,10 +24,16 @@ void Quantize(int N, int M, int& val, int quantNum, ImageType oldImage)
       oldImage.setPixelVal(i, j, val);
     }
 
+  std::stringstream ss;
+  ss << quantNum;
+  std::string s = ss.str();
+   
+    
 
-    char quantumNumber[5] = {(char)quantNum};
-    strcat(writefilePath, quantumNumber);
+    strcat(writefilePath, s.c_str());
     strcat(writefilePath, ".pgm");
+
+    std::cout << writefilePath << std::endl;    
     writeImage(writefilePath, oldImage);
 
 };
