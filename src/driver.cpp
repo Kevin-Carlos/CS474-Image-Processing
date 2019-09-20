@@ -5,42 +5,49 @@
 
 int readImageHeader(const char[], int&, int&, int&, bool&);
 int readImage(const char[], ImageType&);
-int writeImage(const char[], ImageType&);
+void Quantize(int N, int M, int& val, int quantNum, ImageType oldImage);
 
 int main(int argc, char *argv[]) {
     //int M, N, Q;
 
-    int i, j; 
-    int M, N, Q;
-    bool type;
-    int val;
-    int thresh;
-    const char* filePath = "./data_input/peppers.pgm";
+  int i, j; 
+  int M, N, Q;
+  bool type;
+  int val;
+  int thresh;
 
-    readImageHeader(filePath, N, M, Q, type);
+  const char* filePath = "./data_input/peppers.pgm";
 
-    ImageType image(N, M, Q);
+  readImageHeader(filePath, N, M, Q, type);
 
-    readImage(filePath, image);
+  ImageType image(N, M, Q);
+
+  readImage(filePath, image);
     
-    //std::cout << "Enter threshold: ";
-    //std::cin >> thresh;
+  //const char *writefilePath;
 
- // threshold image 
-
- for(i=0; i<N; i++)
-   for(j=0; j<M; j++) {
-     image.getPixelVal(i, j, val);
-     if(val < 50) 
-       image.setPixelVal(i, j, 255);
-     else
-       image.setPixelVal(i, j, 0);
+  for(int k = 0; k < 4; k++)
+  {
+    switch(k)
+    {
+      case (0):
+        Quantize(N, M, val, 128, image);
+        break;
+      case (1):
+        Quantize(N, M, val, 32, image);
+        break;
+      case (2):
+        Quantize(N, M, val, 8, image);
+        break;
+      case (3):
+        Quantize(N, M, val, 2, image);
+        break;   
     }
+  }
 
-   const char *writefilePath = "./data_input/peppers_test.pgm";
+  
 
- // write image
- writeImage(writefilePath, image);
+ 
 
  return (1);
 
