@@ -10,13 +10,12 @@ void Quantize(int N, int M, int& val, int quantNum, ImageType oldImage);
 int main(int argc, char *argv[]) {
     //int M, N, Q;
 
-  int i, j; 
-  int M, N, Q;
-  bool type;
-  int val;
-  int thresh;
-
-  const char* filePath = "./data_input/peppers.pgm";
+    int i, j;
+    int M, N, Q;
+    bool type;
+    int val;
+    int thresh;
+    const char* filePath = "./data_input/peppers.pgm";
 
   readImageHeader(filePath, N, M, Q, type);
 
@@ -44,9 +43,6 @@ int main(int argc, char *argv[]) {
         break;   
     }
   }
-
-  
-
  
 
  return (1);
