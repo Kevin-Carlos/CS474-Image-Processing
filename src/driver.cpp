@@ -10,7 +10,7 @@ int writeImage(const char[], ImageType&);
 int main(int argc, char *argv[]) {
     //int M, N, Q;
 
-    int i, j; 
+    int i, j;
     int M, N, Q;
     bool type;
     int val;
@@ -22,22 +22,22 @@ int main(int argc, char *argv[]) {
     ImageType image(N, M, Q);
 
     readImage(filePath, image);
-    
+
     //std::cout << "Enter threshold: ";
     //std::cin >> thresh;
 
- // threshold image 
+ // threshold image
 
  for(i=0; i<N; i++)
    for(j=0; j<M; j++) {
      image.getPixelVal(i, j, val);
-     if(val < 50) 
+     if(val < 50)
        image.setPixelVal(i, j, 255);
      else
        image.setPixelVal(i, j, 0);
     }
 
-   const char *writefilePath = "./data_input/peppers_test.pgm";
+   const char *writefilePath = "./data_output/peppers_test.pgm";
 
  // write image
  writeImage(writefilePath, image);
