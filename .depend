@@ -1,5 +1,6 @@
 driver.o: src/driver.cpp src/../include/image.h
 image.o: src/image.cpp src/../include/image.h
+PA01-Q2.o: src/PA01-Q2.cpp src/../include/image.h
 ReadImage.o: src/ReadImage.cpp src/../include/image.h
 ReadImageHeader.o: src/ReadImageHeader.cpp src/../include/image.h
 WriteImage.o: src/WriteImage.cpp src/../include/image.h
