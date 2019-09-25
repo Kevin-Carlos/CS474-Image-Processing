@@ -19,14 +19,16 @@ void Quantize(int N, int M, int& val, int quantNum, ImageType oldImage, char wri
  
   char temporary[50] = ""; 
   
+  oldImage.setImageInfo(N, M, quantNum); //Update the image so the quantum level matches Q
   std::stringstream ss;
   ss << quantNum; //copy the quantNum as a string from int
   
   strcpy(temporary, writePath); //take the file to write to and copy it into temporary
   quantNum = 256/quantNum; //will set the quantNum = #pixels/ratio
-                           //example: for the first question i) 128, it will be 256/128 = 2            
+                           //example: for the first question i) 128, it will be 256/128 = 2           
                            
   
+
   for(int i=0; i<N; i++)
     for(int j=0; j<M; j++) 
     {
@@ -35,9 +37,11 @@ void Quantize(int N, int M, int& val, int quantNum, ImageType oldImage, char wri
       oldImage.setPixelVal(i, j, val);
     }
 
+  
   std::string s = ss.str();
   strcat(temporary, s.c_str());
-  strcat(temporary, ".pgm");
+  strcat(temporary, "_Quantized.pgm");
+  
   writeImage(temporary, oldImage);
 
 };

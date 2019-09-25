@@ -4,6 +4,6 @@ void Question3();
 
 int main(int argc, char *argv[]) {
   // Question1();
-  // Question2();
-  Question3();
+   //Question2();
+  //Question3();
 }
