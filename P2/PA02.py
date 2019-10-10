@@ -1,119 +1,78 @@
 from PIL import Image
 import numpy as np
 
-def grab_mask(mask_size):
-    maskImage = Image.open("./data_input/Pattern.pgm")
-    # im.save("./data_output/Pattern.pgm")
+def normalize(width, height, mask):    
+    normalizeVal = width * height
 
-    pixels = list(maskImage.getdata())
-    width, height = maskImage.size
+    pixels = list(mask.getdata())
     pixels = [pixels[i * width: (i+1) * width] for i in range(height)]
 
-    # grab the neighborhood for mask
-    mask = []
-    for i in range(height): #rows
-        for j in range(width): #columns
-
-                if (pixels[i][j] != 0):
-                    # Found first nonoccurence of black, grab mask
-                    # grab neighborhood
-                    mask = grab_neighborhood(mask_size, i, j, pixels)
-                    break
-        else:
-            continue
+    for rows in range(height):
+        for cols in range(width):
+            pixels[rows][cols] = ((pixels[rows][cols] / normalizeVal) * 255)
+            boundCheck(rows, cols, width, height)
         break
+    return pixels
 
-    average = mask_size*mask_size
-    for i in range(mask_size):
-        for j in range(mask_size):
-            mask[i][j] = mask[i][j] / average
+def boundCheck(currRow, currCol, width, height):
+    #truncate the height and width becasue we start our origin at the center
+    #so if its 5x5 we will be going up and down 2 and left and right 2
+    #that means the topright corner will be technically -2,-2 or
+    #3 from the origin diagnally
+    masktempHeight = height - 2 #example 3 to right go 1 to get to boundary
+    masktempWidth = width - 2
 
-    for items in mask:
-        print(items)
-
-    # Correlation(mask, mask_size)
-
-#grab neighborhood of pixels and create a new array of sizexsize
-def grab_neighborhood(size, row, col, pixels): 
-    # print(row, col)
-
-    #Create new mask array of sizexsize
-    newMask = np.empty((size, size))
-
-    tempRow = row
-    tempCol = col
-
-    #iterate over a sizexsize array at current row and column
-    for i in range(size): 
-        for j in range(size): 
-            print(tempRow, tempCol)
-        
-
-            # Left boundary
-            # if (row < size)
-            # Top boundary
-            # if (col < size)
-            # Right boundary
-           
-            # Bottom boundary
-
-            
-            # boundaryCol = height - currentcolumn;
-            # boundaryRow = width - currentrow;
-            # if(boundarycol < size)
-            # for(row = 0; row < boundaryRow; row++)
-            #     for(col = 0; < boundaryCol; row++)
-
-                # boundaryRow = width - i
-                # boundaryCol = height - j
-                
-                # if (boundaryRow < size):
-                #     #if current row is 60/60 then set the mask size 
-                #     size = boundaryRow
-                # elif (boundaryCol < size):
-                #     #if current col is 60/60 then set the mask size 
-                #     size = boundaryCol
-                
-            
-               
-
-
-
-            # start at the current row and column
-            newMask[i][j] = pixels[tempRow][tempCol]
-
-            tempCol += 1
-        tempRow += 1
-        tempCol = col
-
-   
-    return newMask
-
-# def grabMaskWPadding():
-
-# def grabSummationedVal(mask, srcImgPixels, mask_size):
-            
+    #actual image width = 5
+    #Actual image width - masktempwidth == 0
     
-# def Correlation(mask, mask_size):
-#     image = Image.open("./data_input/Image.pgm")
-#     srcImgPixels = list(image.getdata())
-#     width, height = image.size
-#     srcImgPixels = [srcImgPixels[i * width: (i+1) * width] for i in range(height)]
+    bounds = []
+    # [left, right, top, bottom]
 
-#     newMask = np.empty((mask_size, mask_size))
+    #if we are going out of bounds in the left boundary
+    if (tempWidth - currRow < 0):
+        # print("Width - 2: ", tempWidth)
+        # print("Row: ", currRow)
+        bounds.append(1)
+    else:
+        bounds.append(0)
 
-#     for rows in range(height):
-#         for cols in range(width):
-#             newMask = grab_neighborhood(mask_size, rows, cols, srcImgPixels)
+    #if we are going out of bounds in the right boundary
+    if(currRow - tempWidth < 0):
+        bounds.append(1)
+    else:
+        bounds.append(0)
+        
+    #if we are going out of bounds in the top boundary
+    if (tempHeight - currCol < 0):
+        bounds.append(1)
+    else:
+        bounds.append(0)
 
-#             break
-#         else:
-#             continue
-#         break
+    #if we are going out of bounds in the bottom boundary
+    if(currCol - tempHeight < 0):
+        # print("Height - 1: ", tempHeight)
+        # print("Column: ", currCol)
+        bounds.append(1)
+    else:
+        bounds.append(0)
+    
+    print(currRow, currCol)
+    print(bounds)
 
-#     for items in newMask:
-#         print(items)
+def Correlation(mask_size, mask):
+    image = Image.open("./data_input/Image.pgm")
+    # im.save("./data_output/Pattern.pgm")
 
+    width = mask_size[0]
+    height = mask_size[1]
 
+    normalizedMask = normalize(width, height, mask)
 
-grab_mask(3)
+    
+
+    
+    # center = []
+    # center.append([width//2, height//2])
+
+maskImage = Image.open("./data_input/Pattern.pgm")
+Correlation(maskImage.size, maskImage)
