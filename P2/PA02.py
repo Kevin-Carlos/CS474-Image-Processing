@@ -21,7 +21,7 @@ def Normalize(width, height, mask):
 
     for rows in range(height):
         for cols in range(width):
-            pixels[rows][cols] = ((pixels[rows][cols] / normalizeVal))
+            pixels[rows][cols] = ((pixels[rows][cols] / normalizeVal)) # I took out the * 255 idk if its needed :shrugs:
     return pixels
 
 def MapCorrelation(mask, image, normalizedMask):
@@ -29,14 +29,18 @@ def MapCorrelation(mask, image, normalizedMask):
     imagePixels = list(image.getdata())
     imagePixels = [imagePixels[i * image.size[0]: (i+1) * image.size[0]] for i in range(image.size[1])]
     
+    # Allocate a new image type of same size
     correlatedMap = Image.new("L", (image.size[0], image.size[1]))
     # print("Size:", correlatedMap.size)
     # correlatedPixels = list(correlatedMap.getdata())
     # correlatedPixels = [correlatedPixels[i * image.size[0]: (i+1) * image.size[0]] for i in range(image.size[1])]
 
+
+    # This loop is for the image itself, going from 0 to whatever the end is
     for i in range(image.size[0]):
         for j in range(image.size[1]):
             
+            # This goes into a funciton to do the summation/apply the mask for the i, j pixel position
             value = int(ApplyMask(i, j, mask, image, normalizedMask, imagePixels))
 
             try:
@@ -55,17 +59,22 @@ def MapCorrelation(mask, image, normalizedMask):
 
 def ApplyMask(i, j, mask, image, maskPixels, imagePixels):
     summation = 0
+
+    # This loop loops from -K/2 to K/2 on the mask and calculates the corresponding coordinate to map it to, so 0,0 on the image is -41, -27 for the pattern
     for row in range(-(mask.size[0] // 2), mask.size[0] // 2):
         for col in range(-(mask.size[1] // 2), mask.size[1] // 2):
             imageCoordW = i - (mask.size[0] // 2)
             imageCoordH = j - (mask.size[1] // 2)
 
+            # Make sure the coord is within bounds otherwise just call it 0
             try:
-                summation = summation + (maskPixels[row][col] * imagePixels[imageCoordW][imageCoordH])
+                if (imageCoordW > 0 and imageCoordW < image.size[0] and imageCoordH > 0 and imageCoordH < image.size[1]):
+                    summation = summation + (maskPixels[row][col] * imagePixels[imageCoordW][imageCoordH])
+                    summation = summation // (i*j)
             except:
                 summation = summation + 0
 
-    return summation
+    return summation 
 
 
 maskImage = Image.open("./data_input/Pattern.pgm")
