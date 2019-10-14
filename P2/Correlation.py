@@ -46,8 +46,8 @@ def MapCorrelation(mask, image):
     maxVal = 0
     minVal = 4546465165
 
-    for cols in range(image.size[0]): #442 Col
-        for rows in range(image.size[1]): #288 Row
+    for rows in range(image.size[1]): #288 Row
+        for cols in range(image.size[0]): #442 Col
             
             value = int(ApplyMask(mask, image, cols, rows))
             
@@ -86,16 +86,32 @@ def ApplyMask(mask, image, imageCols, imageRows):
 
     mask = np.asarray(mask)
 
-    for maskCols in range(-(mask.shape[1] // 2), mask.shape[1] // 2):
-        for maskRows in range(-(mask.shape[0] // 2), mask.shape[0] // 2):
+    for maskRows in range(-(mask.shape[1] // 2), mask.shape[1] // 2): #55 = 27
+        for maskCols in range(-(mask.shape[0] // 2), mask.shape[0] // 2): #83 = 41
+
+            # Get the image col and row
             coordCol = maskCols + imageCols
             coordRow = maskRows + imageRows
 
-            try:
-                F = image.getpixel((coordCol, coordRow))
-                W = mask[maskCols][maskRows]
-                summation = summation + (F * W)
-            except:
+            # Check right and bottom Bounds
+            checkBottom = image.size[1] - (coordRow)
+            checkRight = image.size[0] - (coordCol)
+            
+            # Get the original row and col for the mask, not -41,-27 but 0,0
+            colMask = maskCols + (mask.shape[0] // 2)
+            rowMask = maskRows + (mask.shape[1] // 2)
+
+            # print(rowMask, colMask)
+
+            # check all bounds that are negative
+            if(coordCol >= 0 and coordRow >= 0 and checkBottom >= 0 and checkRight >= 0):
+                try:
+                    F = image.getpixel((coordCol, coordRow))
+                    W = mask[rowMask][colMask]
+                    summation = summation + (F * W)
+                except:
+                    summation += 0
+            else:
                 summation += 0
 
     return summation
