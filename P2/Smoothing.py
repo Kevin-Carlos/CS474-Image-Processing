@@ -61,7 +61,7 @@ def Smoothing(mask_size, image):
 
     averagedMask = Average(averagingMask7)
 
-    MapAveraging(averagedMask, image)
+    MapSmoothing(averagedMask, image)
     
 
 def Average(mask):
@@ -77,7 +77,7 @@ def Average(mask):
     return mask
 
 
-def MapAveraging(mask, image):
+def MapSmoothing(mask, image):
     # Initialize new Image to store the Average pixels
     newImage = Image.new("L", (image.size[0], image.size[1]))
 
