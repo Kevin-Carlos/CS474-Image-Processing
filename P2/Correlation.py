@@ -53,9 +53,7 @@ def MapCorrelation(mask, image):
             
             correlatedImage.putpixel((cols, rows), value)
 
-    # Find max and min value to scale accordingly, but min should be 0
-    for cols in range(correlatedImage.size[0]):
-        for rows in range(correlatedImage.size[1]):
+            # find Min Max Values
             if (correlatedImage.getpixel((cols, rows)) > maxVal):
                 maxVal = correlatedImage.getpixel((cols, rows))
             if (correlatedImage.getpixel((cols, rows)) < minVal):
