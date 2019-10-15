@@ -1,7 +1,7 @@
 #
 # Authors: Kevin Carlos and Aditya Sidher
-# Details: This file contains the implementation for Smoothing "lenna" and "sf" using 
-# 7x7 and 15x15 averaging filters and 7x7 and 15x15 Guassian filters
+# Details: This file contains the implementation for Median filtering "lenna" 
+# and "boat" using  7x7 and 15x15 averaging/median filters
 
 from PIL import Image
 import numpy as np
@@ -18,46 +18,33 @@ averagingMask7 = np.array([[1, 1, 1, 1, 1, 1, 1],
                            [1, 1, 1, 1, 1, 1, 1]], np.float32)
 
                 
-averagingMask15 = np.array([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],                
-                            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], np.float32)
+averagingMask15 = np.array(
+    [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],                
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]], np.float32)
 
 
 def Median(mask_size, image):
 
-    # averagedMask = Average(averagingMask7)
     # corruptedImage =  Corrupt(image, 255) 
     # corruptedImage = Corrupt(corruptedImage, 0)
     corruptedImage = Image.open("./data_output/Q03/lenna_Corrupted30.pgm")
-    MapAveraging(averagingMask15, corruptedImage)
-
-
-def Average(mask):
-    
-    # Find the sum of the elements in the mask
-    for i in range(mask.shape[0]):
-        for j in range(mask.shape[1]):
-            value = mask[i][j]
-            average = value / (mask.shape[0] * mask.shape[1])
-            mask[i][j] = average
-            
-
-    return mask
+    MapMedian(averagingMask15, corruptedImage)
     
 
-def MapAveraging(mask, image):
-    # Initialize new Image to store the Average pixels and Pad area around
+def MapMedian(mask, image):
+    # Initialize new Image to store the Median pixels and Pad area around
     newImage = Image.new("L", (image.size[0], image.size[1]))
 
     # new array to store the summation values
@@ -104,8 +91,8 @@ def ApplyMask(mask, image, imageCols, imageRows):
     arrayMaskandImage = [neighborhoodSize]
 
 
-    for maskRows in range(-(mask.shape[1] // 2), mask.shape[1] // 2): #mxm row
-        for maskCols in range(-(mask.shape[0] // 2), mask.shape[0] // 2): #mxm col
+    for maskRows in range(-(mask.shape[1] // 2), mask.shape[1] // 2):#m row
+        for maskCols in range(-(mask.shape[0] // 2), mask.shape[0] // 2):#m col
 
             # Get the image col and row
             coordCol = maskCols + imageCols
