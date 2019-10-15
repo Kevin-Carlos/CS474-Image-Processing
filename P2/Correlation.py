@@ -78,7 +78,7 @@ def ScaleValues(img, maxVal, minVal):
     
     return img
 
-# Correlation summation on the mask overlay
+# Correlation summation on the mask overlay and Pad area around
 def ApplyMask(mask, image, imageCols, imageRows):
     summation = 0
 
