@@ -101,7 +101,7 @@ def MapAveraging(mask, image):
     
     newImage = ScaleValues(newImage, maxVal, minVal, arrayImage)
 
-    newImage.save("./data_output/sf_7x7.pgm")
+    newImage.save("./data_output/Q02/sf_7x7.pgm")
 
 # Get the values back from [0, 255]
 def ScaleValues(img, maxVal, minVal, arrayImage):

@@ -61,7 +61,7 @@ def MapCorrelation(mask, image):
 
     correlatedImage = ScaleValues(correlatedImage, maxVal, minVal)
 
-    correlatedImage.save("./data_output/Correlation.pgm")
+    correlatedImage.save("./data_output/Q01/Correlation.pgm")
 
 # Get the values back from [0, 255]
 def ScaleValues(img, maxVal, minVal):
