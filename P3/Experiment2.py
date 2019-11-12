@@ -9,21 +9,23 @@ import matplotlib.pyplot as plt
 
 
 def Experiment2():
-    partA()
-    # Test()
+    generateImg()
+    # DFT2D()
     
-
-def Test():
-
-    # # N = 64x2
-    N = 128
-    isign = -1
+    
+# Does the FFT of a 2D image
+def DFT2D():
    
-    image = Image.open("./data_input/lenna.pgm")
+    image = Image.open("./data_input/generatedImg.pgm")
     pixels = list(image.getdata())
     width, height = image.size
     newImage = Image.new("L", (width, height))
     pixels = [pixels[i * width:(i + 1) * width] for i in range(height)]
+
+
+    # # N = 64x2
+    N = (image.size[0] + image.size[1]) // 4
+    isign = -1
             
     # Iterate over all the rows and store it into test2D
     pixels = ApplyFFTRow(pixels, width, N, isign)
@@ -32,35 +34,27 @@ def Test():
     pixels = ApplyFFTCol(pixels, height, N, isign)
 
     
-    # minVal = 10000000
-    # maxVal = -10101010
+    minVal = 1000000000000000000000000000
+    maxVal = -101010100000000000000000000
+    # newImage = LogScaleValues(newImage, maxVal, minVal, pixels, height, width)
 
-    # # fine Min Max
-    # for rows in range(height):
-    #     for cols in range(width):
-    #         # find Min Max Values
-    #         if (pixels[rows][cols] > maxVal):
-    #             maxVal = pixels[rows][cols]
-    #         if (pixels[rows][cols] < minVal):
-    #             minVal = pixels[rows][cols]
+    newImage = LinearScaleValues(newImage, maxVal, minVal, pixels, height, width)
 
-    # newImage = ScaleValues(newImage, maxVal, minVal, pixels, height, width)
-                
     ################# Do the reverse ##################################################   
 
-    # Iterate over all the columns and store it into pixels
-    pixels = ApplyFFTCol(pixels, height, N, 1)
+    # # Iterate over all the columns and store it into pixels
+    # pixels = ApplyFFTCol(pixels, height, N, 1)
 
-    # Iterate over all the rows and store it into test2D
-    pixels = ApplyFFTRow(pixels, width, N, 1)
+    # # Iterate over all the rows and store it into test2D
+    # pixels = ApplyFFTRow(pixels, width, N, 1)
                 
    
-    for rows in range(height):
-        for cols in range(width):
-            val = int(pixels[rows][cols])
-            newImage.putpixel((cols,rows), val)
+    # for rows in range(height):
+    #     for cols in range(width):
+    #         val = int(pixels[rows][cols])
+    #         newImage.putpixel((cols,rows), val)
 
-    newImage.save("./data_output/Experiment2/Lenna_Inverse_FFT.png")
+    newImage.save("./data_output/Experiment2/parta/generateimg_Shifted_LinearScale.png")
 
 
 # Iterate over all the rows and store it into pixels
@@ -69,14 +63,14 @@ def ApplyFFTRow(pixels, width, N, isign):
         if(isign == -1): # Forward
             test2D = np.array(pixels)[i, 0:width] # set test2D equal to the pixel row of i
             test2D = np.insert(test2D, 0, 0.0)  # Add 0 in the front because we don't use data[0]
-            test2D = fft(test2D/N, N, isign) # Do the fft on the current Row
+            test2D = fft(test2D, N, isign) # Do the fft on the current Row
             test2D = np.delete(test2D, 0) # Delete data[0]
             test2D = changeAmplitudeFrequency(test2D) # Move the entire 1-D array over by N
         elif(isign == 1): # Inverse
             test2D = np.array(pixels)[i, 0:width] # set test2D equal to the pixel row of i
             test2D = changeAmplitudeFrequency(test2D) # Move the entire 1-D array over by N
             test2D = np.insert(test2D, 0, 0.0)  # Add 0 in the front because we don't use data[0]
-            test2D = fft(test2D, N, 1) # Do the Inverse fft on the current Row
+            test2D = fft(test2D/N, N, 1) # Do the Inverse fft on the current Row
             test2D = np.delete(test2D, 0) # Delete data[0]
         else:
             print("Error isign can only be 1 or -1, exiting.")
@@ -94,14 +88,14 @@ def ApplyFFTCol(pixels, height, N, isign):
         if(isign == -1): # Forward
             test2D = np.array(pixels)[0:height, i]
             test2D = np.insert(test2D, 0, 0.0)
-            test2D = fft(test2D/N, N, isign) 
+            test2D = fft(test2D, N, isign) 
             test2D = np.delete(test2D, 0)
             test2D = changeAmplitudeFrequency(test2D)
         elif(isign == 1): # Inverse
             test2D = np.array(pixels)[0:height, i]
             test2D = changeAmplitudeFrequency(test2D)
             test2D = np.insert(test2D, 0, 0.0)
-            test2D = fft(test2D, N, isign) 
+            test2D = fft(test2D/N, N, isign) 
             test2D = np.delete(test2D, 0)
         else:
             print("Error isign can only be 1 or -1, exiting.")
@@ -111,11 +105,30 @@ def ApplyFFTCol(pixels, height, N, isign):
             pixels[j][i] = test2D[j]
     return pixels
 
+# Scale the image Linearly through min max values 
+def LinearScaleValues(img, maxVal, minVal, arrayImage, Height, Width):
 
-def ScaleValues(img, maxVal, minVal, arrayImage, Height, Width):
+    # fine Min Max
+    for rows in range(Height):
+        for cols in range(Width):
+                arrayImage[rows][cols] = abs(arrayImage[rows][cols])
+    
+    print(minVal, maxVal)
+
+    # find Min Max
+    for rows in range(Height):
+        for cols in range(Width):
+            # find Min Max Values
+            if (arrayImage[rows][cols] > maxVal):
+                maxVal = arrayImage[rows][cols]
+            if (arrayImage[rows][cols] < minVal):
+                minVal = arrayImage[rows][cols]
+
+
     scalar = 255 / maxVal
-    scalar = round(scalar, 2)
-
+    scalar = round(scalar, 10)
+    print(scalar)
+    print(maxVal, minVal)
     for rows in range(Height):
         for cols in range(Width):
             val = arrayImage[rows][cols]
@@ -123,7 +136,22 @@ def ScaleValues(img, maxVal, minVal, arrayImage, Height, Width):
             val = int(val * scalar)
             # print(val)
             img.putpixel((cols, rows), val)
+            arrayImage[rows][cols] = val
     
+    return img
+
+#Log Scale the images and then bring the values back in range from 0 - 255
+def LogScaleValues(img, maxVal, minVal, arrayImage, Height, Width):
+    for rows in range(Height):
+        for cols in range(Width):
+            val = arrayImage[rows][cols]
+            # print(val, 1 + abs(val))
+            val = int(math.log(1 + (abs(val))))
+            # print(val)
+            img.putpixel((cols, rows), val)
+            arrayImage[rows][cols] = val
+    img = LinearScaleValues(img, maxVal, minVal, arrayImage, Height, Width)
+
     return img
 
 # Fast Fourier Transform for Discrete 1-D Array
@@ -185,7 +213,7 @@ def changeAmplitudeFrequency(array):
     return array
 
 
-def partA():
+def generateImg():
     # Generate a 512 x 512, place a 32x32 white square at the center
     # Everything else black
 
@@ -194,64 +222,32 @@ def partA():
 
     # Create white square at center
     # 32 x 32
-    for i in range(-16, 16):
-        for j in range(-16, 16):
+    for i in range(-128, 128):
+        for j in range(-128, 128):
             genPixels[center+i][center+j] = 255
     
-    # genImg32x32 = Image.new("L", size=(512, 512))
+    genImg32x32 = Image.new("L", size=(512, 512))
     
     # Store pixels into image to check
-    # for i in range(512):
-    #     for j in range(512):
-    #         val = int(genPixels[i][j])
-    #         genImg.putpixel((i, j), val)
+    for i in range(512):
+        for j in range(512):
+            val = int(genPixels[i][j])
+            genImg32x32.putpixel((i, j), val)
     
-    # genImg.save("./data_output/Experiment2/generatedImg32x32.png")
+    genImg32x32.save("./data_input/generatedImg256.png")
 
-    ############ Extend loop to -32 to 32 #########################
-    # 64x64 white square
-    for i in range(-32, 32):
-        for j in range(-32, 32):
-            genPixels[center+i][center+j] = 255
+    # ############ Extend loop to -32 to 32 #########################
+    # # 64x64 white square
+    # for i in range(-32, 32):
+    #     for j in range(-32, 32):
+    #         genPixels[center+i][center+j] = 255
         
     
-    ########### Extend loop to -64 to 64 ##########################
-    # 128x128 white square
-    for i in range(-64, 64):
-        for j in range(-64, 64):
-            genPixels[center+i][center+j] = 255
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    # ########### Extend loop to -64 to 64 ##########################
+    # # 128x128 white square
+    # for i in range(-64, 64):
+    #     for j in range(-64, 64):
+    #         genPixels[center+i][center+j] = 255
 
 
 # maskImage = Image.open("./data_input/sf.pgm")

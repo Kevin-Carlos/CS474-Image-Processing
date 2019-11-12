@@ -12,7 +12,7 @@ def Experiment1():
     # PartA()
     # PartB()
     # PartC()
-
+    
 #******************Part A******************#
 def PartA():
     data = np.array([2, 3, 4, 4])
