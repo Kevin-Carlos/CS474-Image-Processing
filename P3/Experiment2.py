@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 
 
 def Experiment2():
-    Test()
+    partA()
+    # Test()
     
 
 def Test():
@@ -182,6 +183,75 @@ def changeAmplitudeSpatial(array):
 def changeAmplitudeFrequency(array):
     array = np.roll(array, array.size//2)
     return array
+
+
+def partA():
+    # Generate a 512 x 512, place a 32x32 white square at the center
+    # Everything else black
+
+    genPixels = np.zeros((512, 512), dtype=int)
+    center = genPixels.shape[0] // 2
+
+    # Create white square at center
+    # 32 x 32
+    for i in range(-16, 16):
+        for j in range(-16, 16):
+            genPixels[center+i][center+j] = 255
+    
+    # genImg32x32 = Image.new("L", size=(512, 512))
+    
+    # Store pixels into image to check
+    # for i in range(512):
+    #     for j in range(512):
+    #         val = int(genPixels[i][j])
+    #         genImg.putpixel((i, j), val)
+    
+    # genImg.save("./data_output/Experiment2/generatedImg32x32.png")
+
+    ############ Extend loop to -32 to 32 #########################
+    # 64x64 white square
+    for i in range(-32, 32):
+        for j in range(-32, 32):
+            genPixels[center+i][center+j] = 255
+        
+    
+    ########### Extend loop to -64 to 64 ##########################
+    # 128x128 white square
+    for i in range(-64, 64):
+        for j in range(-64, 64):
+            genPixels[center+i][center+j] = 255
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # maskImage = Image.open("./data_input/sf.pgm")
