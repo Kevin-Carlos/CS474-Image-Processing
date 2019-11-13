@@ -61,12 +61,13 @@ def PartB():
     partb3 = np.delete(partb3, 0)
 
     partb3 = changeAmplitudeFrequency(partb3)
-    magnitudeData = getMagnitude(partb3, N)
-    plotFunction(magnitudeData, "./data_output/Experiment1/cosMagnitudeFFT", 'x', 'y', 'Magnitude Fourier Transform of Cosine')
 
    
     # print(retData)
     plotFunction(partb3, "./data_output/Experiment1/cosFFT", 'Sample(N)', 'Amplitude', 'Fourier Transform of Cosine')
+
+    magnitudeData = getMagnitude(partb3, N)
+    plotFunction(magnitudeData, "./data_output/Experiment1/cosMagnitudeFFT", 'x', 'y', 'Magnitude Fourier Transform of Cosine')
 
     # Shift Everything back left by N and then add a 0 to the beginning
     partb3 = changeAmplitudeFrequency(partb3)
@@ -207,7 +208,7 @@ def plotFunction(array, name, xlabel, ylabel, title):
     plt.ylabel(ylabel)
     plt.savefig(name + ".png")
 
-# get the Magnitude of the Fourier transform For Fun
+# get the Magnitude of the Fourier transform For "Fun"
 def getMagnitude(array, N):
     size = N*2
     for rows in range(size):
