@@ -22,7 +22,7 @@ def PartA():
     
     # Push the array right since data[0] isn't used
     # divide by nn or 1/N for normalization
-    newData = np.insert(data, 0, 0.0)
+    newData = np.insert(data/N, 0, 0.0)
     print(newData)
 
     # Do fft to data
@@ -31,6 +31,10 @@ def PartA():
     # Plot the output without 0
     retData = np.delete(retData, 0)
     plotFunction(retData, "./data_output/Experiment1/Exp1aFFT", 'x', 'y', 'FFT signal of f = [2,3,4,4]')
+
+    magnitudeData = getMagnitude(retData, N)
+    plotFunction(magnitudeData, "./data_output/Experiment1/Exp1aMagnitudeFFT", 'x', 'y', 'Magnitude FFT signal of f = [2,3,4,4]')
+
     retData = np.insert(retData, 0, 0)
 
     # Do Inverse FFT
@@ -55,7 +59,10 @@ def PartB():
 
     # Delete first element and shift everything left by N
     partb3 = np.delete(partb3, 0)
+
     partb3 = changeAmplitudeFrequency(partb3)
+    magnitudeData = getMagnitude(partb3, N)
+    plotFunction(magnitudeData, "./data_output/Experiment1/cosMagnitudeFFT", 'x', 'y', 'Magnitude Fourier Transform of Cosine')
 
    
     # print(retData)
@@ -92,6 +99,9 @@ def PartC():
     # Delete first element and shift everything left by N
     partc = np.delete(partc, 0)
     partc = changeAmplitudeFrequency(partc)
+
+    # magnitudeData = getMagnitude(partc, N)
+    # plotFunction(magnitudeData, "./data_output/Experiment1/RectMagnitudeFFT", 'x', 'y', 'Magnitude Fourier Transform of Rect_128.dat')
 
     # print(retData)
     plotFunction(partc, "./data_output/Experiment1/RectFFT", 'Sample(N)', 'Amplitude', 'Fourier Transform of Rect_128.dat')
@@ -197,6 +207,14 @@ def plotFunction(array, name, xlabel, ylabel, title):
     plt.ylabel(ylabel)
     plt.savefig(name + ".png")
 
+# get the Magnitude of the Fourier transform For Fun
+def getMagnitude(array, N):
+    size = N*2
+    for rows in range(size):
+            val = array[rows]
+            val = abs(val)
+            array[rows] = val
+    return array
 
 # maskImage = Image.open("./data_input/sf.pgm")
 Experiment1()
