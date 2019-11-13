@@ -9,14 +9,14 @@ import matplotlib.pyplot as plt
 
 
 def Experiment2():
-    generateImg()
-    # DFT2D()
+    # generateImg()
+    DFT2D()
     
     
 # Does the FFT of a 2D image
 def DFT2D():
    
-    image = Image.open("./data_input/generatedImg.pgm")
+    image = Image.open("./data_input/lenna.pgm")
     pixels = list(image.getdata())
     width, height = image.size
     newImage = Image.new("L", (width, height))
@@ -33,15 +33,16 @@ def DFT2D():
     # Iterate over all the columns and store it into pixels
     pixels = ApplyFFTCol(pixels, height, N, isign)
 
+    # Gets the Magnitude of the image
+    pixels = getMagnitude(pixels, height, width)
     
     minVal = 1000000000000000000000000000
     maxVal = -101010100000000000000000000
-    # newImage = LogScaleValues(newImage, maxVal, minVal, pixels, height, width)
+    newImage = LogScaleValues(newImage, maxVal, minVal, pixels, height, width)
 
-    newImage = LinearScaleValues(newImage, maxVal, minVal, pixels, height, width)
+    # newImage = LinearScaleValues(newImage, maxVal, minVal, pixels, height, width)
 
     ################# Do the reverse ##################################################   
-
     # # Iterate over all the columns and store it into pixels
     # pixels = ApplyFFTCol(pixels, height, N, 1)
 
@@ -54,7 +55,7 @@ def DFT2D():
     #         val = int(pixels[rows][cols])
     #         newImage.putpixel((cols,rows), val)
 
-    newImage.save("./data_output/Experiment2/parta/generateimg_Shifted_LinearScale.png")
+    newImage.save("./data_output/Experiment2/partxtra/Lenna_Test.png")
 
 
 # Iterate over all the rows and store it into pixels
@@ -113,7 +114,6 @@ def LinearScaleValues(img, maxVal, minVal, arrayImage, Height, Width):
         for cols in range(Width):
                 arrayImage[rows][cols] = abs(arrayImage[rows][cols])
     
-    print(minVal, maxVal)
 
     # find Min Max
     for rows in range(Height):
@@ -127,8 +127,6 @@ def LinearScaleValues(img, maxVal, minVal, arrayImage, Height, Width):
 
     scalar = 255 / maxVal
     scalar = round(scalar, 10)
-    print(scalar)
-    print(maxVal, minVal)
     for rows in range(Height):
         for cols in range(Width):
             val = arrayImage[rows][cols]
@@ -153,6 +151,7 @@ def LogScaleValues(img, maxVal, minVal, arrayImage, Height, Width):
     img = LinearScaleValues(img, maxVal, minVal, arrayImage, Height, Width)
 
     return img
+
 
 # Fast Fourier Transform for Discrete 1-D Array
 def fft(data, nn, isign):
@@ -203,15 +202,35 @@ def SWAP(array, data1, data2):
     array[data2] = temp1
     return array
 
+# Translate to the center of the frequency in the spatial domain f(x)
 def changeAmplitudeSpatial(array):
     for i in range(0, array.size, 1):
         array[i] = array[i]*((-1)**i)
     return array
 
+# Translate to the center of the frequency in the Frequency domain F(u)
 def changeAmplitudeFrequency(array):
     array = np.roll(array, array.size//2)
     return array
 
+# get the PhaseAngle of the Fourier transform For Fun
+def PhaseAngleShift(array):
+    for i in range(0, array.size, 2):
+        real = array[i]
+        imaginary = array[i+1]
+        phaseAngle = math.atan2((real/imaginary))
+        array[i] = array[i+1] = phaseAngle
+    return array
+
+# get the Magnitude of the Fourier transform For Fun
+def getMagnitude(array, Height, Width):
+    for rows in range(Height):
+        for cols in range(Width):
+            val = array[rows][cols]
+            val = abs(val)
+            array[rows][cols] = val
+
+    return array
 
 def generateImg():
     # Generate a 512 x 512, place a 32x32 white square at the center
