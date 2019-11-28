@@ -8,58 +8,6 @@ import math
 import matplotlib.pyplot as plt
 
 
-def Experiment2():
-    # generateImg()
-    DFT2D()
-    
-    
-# Does the FFT of a 2D image
-def DFT2D():
-   
-    image = Image.open("./data_input/lenna.pgm")
-    pixels = list(image.getdata())
-    width, height = image.size
-    newImage = Image.new("L", (width, height))
-    pixels = [pixels[i * width:(i + 1) * width] for i in range(height)]
-
-    # # N = 64x2
-    N = (image.size[0] + image.size[1]) // 4
-    isign = -1
-    print(N, height, width)
-
-    pixels = normalizeImage(pixels, height, width, N)
-            
-    # Iterate over all the rows and store it into test2D
-    pixels = ApplyFFTRow(pixels, width, N, isign)
-            
-    # Iterate over all the columns and store it into pixels
-    pixels = ApplyFFTCol(pixels, height, N, isign)
-    
-    minVal = 1000000000000000000000000000
-    maxVal = -101010100000000000000000000
-    # newImage = LinearScaleValues(newImage, maxVal, minVal, pixels, height, width)
-    # newImage = LogScaleValues(newImage, maxVal, minVal, pixels, height, width)
-
-    
-
-    ################################## Do the reverse ##################################   
-    # # Iterate over all the columns and store it into pixels
-    # pixels = ApplyFFTCol(pixels, height, N, 1)
-
-    # # Iterate over all the rows and store it into test2D
-    # pixels = ApplyFFTRow(pixels, width, N, 1)
-    # # pixels = changeAmplitudeSpatial(pixels, height, width, N, 1)
-    # newImage = LinearScaleValues(newImage, maxVal, minVal, pixels, height, width)
-                
-   
-    # for rows in range(height):
-    #     for cols in range(width):
-    #         val = int(pixels[rows][cols])
-    #         newImage.putpixel((cols,rows), val)
-
-    newImage.save("./data_output/Potato.png")
-
-
 # Iterate over all the rows and store it into pixels
 def ApplyFFTRow(pixels, width, N, isign):
     for i in range(width):
@@ -108,46 +56,6 @@ def ApplyFFTCol(pixels, height, N, isign):
             pixels[j][i] = test2D[j]
     return pixels
 
-# Scale the image Linearly through min max values 
-def LinearScaleValues(img, maxVal, minVal, arrayImage, Height, Width):
-    
-    # find Min Max
-    for rows in range(Height):
-        for cols in range(Width):
-            # find Min Max Values
-            if (arrayImage[rows][cols] > maxVal):
-                maxVal = arrayImage[rows][cols]
-            if (arrayImage[rows][cols] < minVal):
-                minVal = arrayImage[rows][cols]
-
-    scalar = 255 / maxVal
-    scalar = round(scalar, 10)
-    for rows in range(Height):
-        for cols in range(Width):
-            val = arrayImage[rows][cols]
-            val = int(val * scalar)
-            img.putpixel((cols, rows), val)
-            arrayImage[rows][cols] = val
-    
-    return img
-
-#Log Scale the images and then bring the values back in range from 0 - 255
-def LogScaleValues(img, maxVal, minVal, arrayImage, Height, Width):
-    img = LinearScaleValues(img, maxVal, minVal, arrayImage, Height, Width)
-
-    # Gets the Magnitude of the image
-    arrayImage = getMagnitude(arrayImage, Height, Width)
-    for rows in range(Height):
-        for cols in range(Width):
-            val = arrayImage[rows][cols]
-            val = int(math.log(1 + (abs(val))))
-            img.putpixel((cols, rows), val)
-            arrayImage[rows][cols] = val
-    img = LinearScaleValues(img, maxVal, minVal, arrayImage, Height, Width)        
-    
-
-    return img
-
 
 # Fast Fourier Transform for Discrete 1-D Array
 def fft(data, nn, isign):
@@ -192,6 +100,72 @@ def fft(data, nn, isign):
     return data
 
 
+
+# Scale the image Linearly through min max values 
+def LinearScaleValues(img, maxVal, minVal, arrayImage, Height, Width):
+    
+    # find Min Max
+    for rows in range(Height):
+        for cols in range(Width):
+            # find Min Max Values
+            if (arrayImage[rows][cols] > maxVal):
+                maxVal = arrayImage[rows][cols]
+            if (arrayImage[rows][cols] < minVal):
+                minVal = arrayImage[rows][cols]
+
+    print(minVal, maxVal)
+    scalar = 255 / maxVal
+    scalar = round(scalar, 10)
+    for rows in range(Height):
+        for cols in range(Width):
+            val = arrayImage[rows][cols]
+            val = int(val * scalar)
+            img.putpixel((cols, rows), val)
+            arrayImage[rows][cols] = val
+    
+    return img
+
+#Log Scale the images and then bring the values back in range from 0 - 255
+def LogScaleValues(img, maxVal, minVal, arrayImage, Height, Width):
+
+    # Gets the Magnitude of the image
+    arrayImage = getMagnitude(arrayImage, Height, Width)
+    for rows in range(Height):
+        for cols in range(Width):
+            val = arrayImage[rows][cols]
+            val = int(math.log(1 + (abs(val))))
+            img.putpixel((cols, rows), val)
+            arrayImage[rows][cols] = val
+    img = LinearScaleValues(img, maxVal, minVal, arrayImage, Height, Width)        
+    
+
+    return img
+
+
+def doubleImageSize():
+    image1 = Image.open("./data_input/lenna.pgm")
+    pixels1 = list(image1.getdata())
+    width1, height1 = image1.size
+    pixels1 = [pixels1[i * width1:(i + 1) * width1] for i in range(height1)]
+
+    width1 = width1 * 2
+    height1 = height1 * 2
+
+    genPixels = np.zeros((height1, width1), dtype=int)
+
+    newImage1 = Image.new("L", (width1, height1))# Store pixels into image to check
+
+    for i in range(width1//2):
+        for j in range(height1//2):
+            val = pixels1[j][i]
+            genPixels[j][i] = val
+            newImage1.putpixel((i, j), val)
+
+    N1 = (newImage1.size[0] + newImage1.size[1]) // 4
+    newImage1.save("./data_input/newLenna.png")
+    # newImage1.show()
+
+
 # Will Swap array[data1] with array[data2]
 def SWAP(array, data1, data2):
     temp1 = array[data1]
@@ -212,7 +186,6 @@ def changeAmplitudeFrequency(array, N):
     array = np.roll(array, N)
     return array
 
-
 # get the Magnitude of the Fourier transform For Fun
 def getMagnitude(array, Height, Width):
     for rows in range(Height):
@@ -222,6 +195,26 @@ def getMagnitude(array, Height, Width):
             array[rows][cols] = val
     return array
 
+def applyFiltering(array1, array2, Height, Width):
+    newarray = array1
+    for rows in range(Height):
+        for cols in range(Width):
+            newarray[rows][cols] = (array1[rows][cols]) * (array2[rows][cols])
+    return newarray
 
 
-Experiment2()
+def generateImg(height, width):
+    # Generate a 512 x 512, place a 32x32 white square at the center
+    # Everything else black
+
+    genPixels = np.zeros((height, width), dtype=int)
+    
+    genImg32x32 = Image.new("L", size=(height, width))
+    
+    # Store pixels into image to check
+    for i in range(height):
+        for j in range(width):
+            val = int(genPixels[i][j])
+            genImg32x32.putpixel((i, j), val)
+    
+    genImg32x32.save("./data_input/generatedImg128.png")
