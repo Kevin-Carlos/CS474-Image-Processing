@@ -5,12 +5,10 @@ import math
 import matplotlib.pyplot as plt
 from FFT import *
 
-
-
 def Experiment3():
 
   # Load the image
-  image = Image.open("./data_input/lenna.pgm")
+  image = Image.open("./data_input/E3/motion_blurred_lenna.1_Muller100.png")
   pixels = list(image.getdata())
   width, height = image.size
   newImage = Image.new("L", (width, height))
@@ -32,18 +30,15 @@ def Experiment3():
   # Iterate over all the columns and store it into pixels
   pixels = ApplyFFTCol(pixels, height, N, isign)
 
-  # pixels = np.fft.fftshift(np.fft.fft2(pixels))
+  minVal = 100000000000000000000000000000000000000000
+  maxVal = -101010100000000000000000000000000000000000
 
-  minVal = 1000000000000000000000000000
-  maxVal = -101010100000000000000000000
-
-  pixels = blurImage(pixels, height, width, 1, 0.1, 0.1)
-
-  # pixels = np.fft.ifftshift(pixels)
-  # pixels = np.real(np.fft.ifft2(pixels))
+  # pixels = blurImage(pixels, height, width, 1, 0.02, 0.02)
   
-  # newImage = LinearScaleValues(newImage, maxVal, minVal, pixels, height, width)
-  # newImage = LogScaleValues(newImage, maxVal, minVal, pixels, height, width)
+  pixels = unblurImage_Weiner_AND_Inverse(pixels, height, width, 1, 0.1, 0.1, 0, 0.025)
+
+  # newImage = LinearScaleValues(newImage, maxVal, minVal, np.real(pixels), height, width)
+  # newImage = LogScaleValues(newImage, maxVal, minVal, np.real(pixels), height, width)
 
   ################################## Do the reverse ##################################   
   # Iterate over all the columns and store it into pixels
@@ -53,41 +48,59 @@ def Experiment3():
   pixels = ApplyFFTRow(pixels, width, N, 1)
 
   # # pixels = changeAmplitudeSpatial(pixels, height, width, N, 1)
-  newImage = LinearScaleValues(newImage, maxVal, minVal, pixels, height, width)
+  newImage = LinearScaleValues(newImage, maxVal, minVal, np.real(pixels), height, width)
 
-  newImage.save("./data_output/motion_blurred_lenna.png")
-  # newImage1.save("./data_output/GaussianRadius.png")
+  newImage.save("./data_output/Experiment 3/Weiner.1_Muller100_K0.025.png")
 
 
+def unblurImage_Weiner_AND_Inverse(array, height, width, T, a, b, IorW, K):
+
+  for i in range(width):
+    for j in range(height):
+
+      u = (i - (width//2)) # Center u 
+      v = (j - (height//2)) # Center v
+      blur = cmath.pi*((u*a)+(v*b) + 0.00001) # Calculate blur using a = b linear uniform motion
+    
+      H = ( T / (blur)) * cmath.sin(blur) * cmath.e**(-(cmath.sqrt(-1)) * blur)
+
+      Hr = np.real(H)
+
+      # Butterworth Lowpass Filter
+      radius = 256
+      magnitude = 10
+      distanceToCenter = math.sqrt((i - (width//2))**2 + (j - (height//2))**2)
+      B = 1 / (1 + (distanceToCenter/radius)**(2*magnitude) )
+      
+      #Inverse Unblur with Butterworth lowpass filter radius
+      if(IorW):
+        array[i][j] = array[i][j]/H * B
+      #Weiner
+      else:
+        array[i][j] = ( ( (1/H) * ((abs(H*np.conj(H)))/(abs(H*np.conj(H)) + K)))  * array[i][j])
+
+  return array
+
+# Blur and then add Noise
 def blurImage(array, height, width, T, a, b):
 
   for i in range(width):
     for j in range(height):
-      # distanceToCenter = math.sqrt((i - (width//2))**2 + (j - (height//2))**2)
 
-      # if(i == 0 and j == 0):
-      #   H = 1
-      #   print(H)
-      #   print(array[i][j])
-      # else:
-      #   H = (T / (cmath.pi*(i*a + j*b))) * cmath.sin( cmath.pi * (i*a + j*b)) * cmath.e**( -(cmath.sqrt(-1)) * cmath.pi * (i*a + j*b))
-      try:
-        H = ( T / ( cmath.pi*( ( (i - (width//2)) *a) + ( (j - (height//2))*b) ) ) ) * cmath.sin( cmath.pi * ( ( (i - (width//2)) *a) + ( (j - (height//2))*b) ) ) * cmath.e**( -(cmath.sqrt(-1)) * cmath.pi * ( ( (i - (width//2)) *a) + ( (j - (height//2))*b) ))
-      except:
-        H = 1
-
-      # H = cmath.e**( -0.0025* (( (i)**2 +  (j)**2)**(5/6)))
+      u = (i - (width//2)) # Center u 
+      v = (j - (height//2)) # Center v
+      blur = cmath.pi*((u*a)+(v*b) + 0.00001) # Calculate blur using a = b linear uniform motion
+      
+      H = ( T / (blur)) * cmath.sin(blur) * cmath.e**(-(cmath.sqrt(-1)) * blur)
 
       Hr = np.real(H)
-      # G = box_muller(0.0, 1.0)
-      # if(j % 2 or i % 2):
-      array[i][j] = array[i][j] * Hr
-      array[i][j] = array[i][j] / Hr
+      G = box_muller(0.0, 100)
 
+      array[i][j] = (array[i][j] * H ) + G
 
   return array
 
-
+# Box muller implemenation for adding Guassian noise
 def box_muller(m, s):
   y2 = x1 = x2 = 0.0
   use_last = 0
@@ -109,18 +122,5 @@ def box_muller(m, s):
     use_last = 1
 
   return (m + y1 * s)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 Experiment3()

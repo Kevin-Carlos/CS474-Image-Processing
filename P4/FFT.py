@@ -7,8 +7,6 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 
-
-
 def doubleImageSize():
     image1 = Image.open("./data_input/lenna.pgm")
     pixels1 = list(image1.getdata())
